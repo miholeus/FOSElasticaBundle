@@ -59,8 +59,12 @@ class ElasticaToModelTransformerCollection implements ElasticaToModelTransformer
     public function transform(array $elasticaObjects)
     {
         $sorted = [];
+        $types = [];
         foreach ($elasticaObjects as $object) {
             $sorted[$object->getType()][] = $object;
+            if (!in_array($object->getType(), $types)) {
+                $types[] = $object->getType();
+            }
         }
 
         $transformed = [];
@@ -79,9 +83,9 @@ class ElasticaToModelTransformerCollection implements ElasticaToModelTransformer
         }
 
         $result = [];
-        foreach ($elasticaObjects as $object) {
-            if (array_key_exists((string) $object->getId(), $transformed[$object->getType()])) {
-                $result[] = $transformed[$object->getType()][(string) $object->getId()];
+        foreach ($types as $type) {
+            foreach ($transformed[$type] as $object) {
+                $result[] = $object;
             }
         }
 
